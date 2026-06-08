@@ -1,1 +1,60 @@
-<p>episodes-page works!</p>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-10 dark:text-white tracking-tight">
+    Rick and Morty <span class="text-blue-500">Episodios</span>
+  </h1>
+
+  @if (isLoading()) {
+    <!-- Estado de Carga (Spinner Tailwind) -->
+    <div class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+    </div>
+  } @else if (error()) {
+    <!-- Estado de Error -->
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-2xl mx-auto text-center" role="alert">
+      <strong class="font-bold">¡Ups! </strong>
+      <span class="block sm:inline">{{ error() }}</span>
+      <button (click)="loadEpisodes()" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors block mx-auto">
+        Reintentar
+      </button>
+    </div>
+  } @else {
+    <!-- Listado de Episodios (Grid Responsivo) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      @for (episode of episodes(); track episode.id) {
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col h-full">
+          
+          <!-- Cabecera de la Tarjeta -->
+          <div class="bg-gray-50 dark:bg-gray-700 px-5 py-4 border-b border-gray-100 dark:border-gray-600">
+            <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1 block">
+              {{ episode.episode }}
+            </span>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white truncate" [title]="episode.name">
+              {{ episode.name }}
+            </h2>
+          </div>
+          
+          <!-- Cuerpo de la Tarjeta -->
+          <div class="p-5 flex-grow">
+            <div class="mb-4">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Fecha de Emisión</p>
+              <p class="text-md font-medium text-gray-900 dark:text-gray-200">{{ episode.air_date }}</p>
+            </div>
+            
+            <div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Personajes</p>
+              <p class="text-md font-medium text-gray-900 dark:text-gray-200">
+                {{ episode.characters.length }} participantes
+              </p>
+            </div>
+          </div>
+
+        </div>
+      } @empty {
+        <!-- Estado Vacío -->
+        <div class="col-span-full text-center py-12">
+          <p class="text-xl text-gray-500 dark:text-gray-400">No se encontraron episodios.</p>
+        </div>
+      }
+    </div>
+  }
+</div>
