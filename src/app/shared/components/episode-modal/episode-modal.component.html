@@ -1,0 +1,66 @@
+<!-- Backdrop oscuro -->
+<div class="fixed inset-0 z-40 bg-gray-900/60 backdrop-blur-sm transition-opacity" (click)="onClose()"></div>
+
+<!-- Contenedor del Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 pointer-events-none" aria-modal="true" role="dialog">
+  
+  <!-- Panel Principal -->
+  <div class="pointer-events-auto relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all">
+    
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-start bg-slate-50">
+      <div>
+        <span class="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-3">
+          {{ episode.episode }}
+        </span>
+        <h3 class="text-2xl font-extrabold text-gray-900 leading-tight">
+          {{ episode.name }}
+        </h3>
+      </div>
+      <!-- Botón Cerrar -->
+      <button (click)="onClose()" class="text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 border border-gray-200 rounded-full p-2 transition-all shadow-sm">
+        <span class="sr-only">Cerrar</span>
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body Scrollable -->
+    <div class="px-6 py-6 overflow-y-auto flex-grow bg-white">
+      
+      <!-- Grid de Información -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
+          <p class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Fecha de Emisión</p>
+          <p class="text-lg font-medium text-gray-900">{{ episode.air_date }}</p>
+        </div>
+        
+        <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50">
+          <p class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1">Registro (API)</p>
+          <p class="text-lg font-medium text-gray-900">{{ episode.created | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+
+      <!-- Lista de Personajes -->
+      <div>
+        <h4 class="text-lg font-bold text-gray-900 border-b border-gray-100 pb-2 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          Personajes Involucrados ({{ episode.characters.length }})
+        </h4>
+        
+        <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+          <ul class="flex flex-wrap gap-2">
+            @for (characterUrl of episode.characters; track characterUrl) {
+              <li class="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-xs font-medium text-gray-700 ring-1 ring-inset ring-gray-200 shadow-sm cursor-help hover:bg-gray-100 transition-colors" [title]="characterUrl">
+                P-{{ getCharacterId(characterUrl) }}
+              </li>
+            }
+          </ul>
+        </div>
+        <p class="text-xs text-gray-400 mt-3 italic">* Nota: El endpoint de episodios retorna las URLs. Los nombres reales requieren llamadas adicionales a la API.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
