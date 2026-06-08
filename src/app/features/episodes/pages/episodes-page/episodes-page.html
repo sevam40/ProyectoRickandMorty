@@ -1,6 +1,6 @@
 <div class="container mx-auto px-4 py-8 max-w-7xl">
   <!-- Cabecera -->
-  <header class="mb-12 text-center">
+  <header class="mb-10 text-center">
     <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
       Rick and Morty <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">Episodios</span>
     </h1>
@@ -8,6 +8,11 @@
       Explora el multiverso a través de la lista completa de aventuras de Rick y Morty.
     </p>
   </header>
+
+  <!-- Buscador -->
+  <div class="mb-12">
+    <app-search-bar [control]="searchControl"></app-search-bar>
+  </div>
 
   @if (isLoading()) {
     <!-- Estado de Carga -->
@@ -69,13 +74,38 @@
         <!-- Estado Vacío -->
         <div class="col-span-full py-24 text-center">
           <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
           <h3 class="text-xl font-bold text-gray-900 mb-1">Sin resultados</h3>
-          <p class="text-gray-500">No se encontraron episodios en esta dimensión.</p>
+          <p class="text-gray-500">No hay episodios que coincidan con "{{ searchControl.value }}".</p>
         </div>
       }
     </div>
+
+    <!-- Paginación -->
+    @if (pageInfo() && pageInfo()?.pages! > 1) {
+      <div class="mt-12 flex justify-center items-center space-x-2 sm:space-x-4">
+        <button 
+          [disabled]="!pageInfo()?.prev"
+          (click)="prevPage()"
+          class="px-5 py-2.5 rounded-xl font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 shadow-sm flex items-center">
+          <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+          <span class="hidden sm:inline">Anterior</span>
+        </button>
+        
+        <span class="text-gray-600 font-medium px-2 sm:px-4 text-sm sm:text-base">
+          Página {{ currentPage() }} de {{ pageInfo()?.pages }}
+        </span>
+        
+        <button 
+          [disabled]="!pageInfo()?.next"
+          (click)="nextPage()"
+          class="px-5 py-2.5 rounded-xl font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:border-blue-200 shadow-sm flex items-center">
+          <span class="hidden sm:inline">Siguiente</span>
+          <svg class="w-4 h-4 ml-1 sm:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </button>
+      </div>
+    }
   }
 
   <!-- Integración del Modal: Desacoplado del bucle principal -->

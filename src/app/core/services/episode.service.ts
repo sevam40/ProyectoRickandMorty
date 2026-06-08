@@ -17,6 +17,12 @@ export class EpisodeService {
     );
   }
 
+  searchEpisodes(name: string, page: number = 1): Observable<PaginatedResponse<Episode>> {
+    return this.http.get<PaginatedResponse<Episode>>(`${this.apiUrl}?page=${page}&name=${name}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ha ocurrido un error desconocido.';
     if (error.error instanceof ErrorEvent) {

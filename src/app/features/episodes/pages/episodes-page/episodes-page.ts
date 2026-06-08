@@ -1,48 +1,96 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
+import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { EpisodeService } from '../../../../core/services/episode.service';
 import { ModalService } from '../../../../shared/services/modal.service';
 import { Episode } from '../../../../models/episode.model';
-import { finalize } from 'rxjs';
+import { Info } from '../../../../models/api-response.model';
 import { EpisodeModalComponent } from '../../../../shared/components/episode-modal/episode-modal.component';
+import { SearchBarComponent } from '../../../../shared/components/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-episodes-page',
   standalone: true,
-  imports: [AsyncPipe, EpisodeModalComponent],
+  imports: [AsyncPipe, EpisodeModalComponent, SearchBarComponent],
   templateUrl: './episodes-page.html',
   styleUrl: './episodes-page.scss',
 })
 export class EpisodesPage implements OnInit {
   private readonly episodeService = inject(EpisodeService);
-  // Hacemos el modalService público para poder usarlo en el template
   readonly modalService = inject(ModalService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly episodes = signal<Episode[]>([]);
+  readonly pageInfo = signal<Info | null>(null);
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
+  readonly currentPage = signal<number>(1);
+  readonly currentSearchTerm = signal<string>('');
+
+  readonly searchControl = new FormControl('');
 
   ngOnInit(): void {
+    this.setupSearch();
     this.loadEpisodes();
   }
 
-  loadEpisodes(page: number = 1): void {
+  private setupSearch(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(term => {
+      const searchTerm = term || '';
+      this.currentSearchTerm.set(searchTerm);
+      this.currentPage.set(1);
+      this.loadEpisodes(1, searchTerm);
+    });
+  }
+
+  loadEpisodes(page: number = 1, name: string = ''): void {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.episodeService.getEpisodes(page)
-      .pipe(
-        finalize(() => this.isLoading.set(false))
-      )
-      .subscribe({
-        next: (response) => {
-          this.episodes.set(response.results);
-        },
-        error: (err) => {
-          this.error.set('No se pudieron cargar los episodios. Por favor, revisa tu conexión e intenta de nuevo.');
+    const request = name 
+      ? this.episodeService.searchEpisodes(name, page) 
+      : this.episodeService.getEpisodes(page);
+
+    request.pipe(
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
+      next: (response) => {
+        this.episodes.set(response.results);
+        this.pageInfo.set(response.info);
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          // La API devuelve 404 cuando no hay resultados de búsqueda
+          this.episodes.set([]);
+          this.pageInfo.set(null);
+        } else {
+          this.error.set('No se pudieron cargar los episodios. Por favor, revisa tu conexión.');
           console.error('Error cargando episodios:', err);
         }
-      });
+      }
+    });
+  }
+
+  nextPage(): void {
+    const info = this.pageInfo();
+    if (info?.next) {
+      this.currentPage.update(p => p + 1);
+      this.loadEpisodes(this.currentPage(), this.currentSearchTerm());
+    }
+  }
+
+  prevPage(): void {
+    const info = this.pageInfo();
+    if (info?.prev) {
+      this.currentPage.update(p => p - 1);
+      this.loadEpisodes(this.currentPage(), this.currentSearchTerm());
+    }
   }
 
   openModal(episode: Episode): void {
