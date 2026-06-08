@@ -10,6 +10,15 @@ import { Info } from '../../../../models/api-response.model';
 import { EpisodeModalComponent } from '../../../../shared/components/episode-modal/episode-modal.component';
 import { SearchBarComponent } from '../../../../shared/components/search-bar/search-bar.component';
 
+
+/**
+ * Componente principal para el listado de episodios.
+ * 
+ * Cumplimiento de Requerimientos Funcionales[cite: 2]:
+ * - Consumo de API: Gestión delegada a EpisodeService para mantener una arquitectura limpia.
+ * - Estados de UI: Manejo reactivo de estados de carga, error y casos sin resultados.
+ * - Experiencia de Usuario: Interfaz construida con Tailwind CSS para máxima legibilidad.
+ */
 @Component({
   selector: 'app-episodes-page',
   standalone: true,

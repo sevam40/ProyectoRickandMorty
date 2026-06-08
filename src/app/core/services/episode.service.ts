@@ -4,6 +4,12 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { PaginatedResponse } from '../../models/api-response.model';
 import { Episode } from '../../models/episode.model';
 
+/**
+ * Servicio encargado de gestionar las peticiones a la API de Rick and Morty.
+ * Se implementó utilizando HttpClient de Angular para realizar peticiones GET 
+ * hacia el endpoint /episode, manteniendo una separación de responsabilidades 
+ * estricta y tipado fuerte en las respuestas.[cite: 2]
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -26,10 +32,8 @@ export class EpisodeService {
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ha ocurrido un error desconocido.';
     if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente o red
       errorMessage = `Error: ${error.error.message}`;
     } else {
-      // El backend retornó un código de error
       errorMessage = `Código de error: ${error.status}, mensaje: ${error.message}`;
     }
     console.error(errorMessage);

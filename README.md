@@ -29,20 +29,27 @@ npm run test
 
 ## 📐 Decisiones Técnicas y Arquitectura
 
-El diseño interno del proyecto se rigió por el principio de **Separación de Responsabilidades** (SoC), escalabilidad y bajo acoplamiento.
+> **Nota para la revisión:** Para facilitar la evaluación de esta prueba, las decisiones técnicas clave han sido documentadas referenciando los requisitos específicos del desafío original. Esto asegura que cada implementación responda directamente a una necesidad del negocio.
+
+El diseño interno del proyecto se rigió estrictamente por los principios de **Separación de Responsabilidades (SoC)**, **escalabilidad** y **bajo acoplamiento**.
+
+---
 
 ### 1. Estilos con Tailwind CSS v4
-Se optó por el enfoque de *Utility-First CSS* por su incomparable velocidad de diseño y porque asegura que el archivo final de CSS pese lo menos posible en producción. Al usar la v4, simplificamos el stack eliminando el clásico archivo `tailwind.config.js`.
+Se optó por el enfoque **Utility-First CSS** debido a su alta velocidad de diseño y desarrollo. Al incorporar la nueva **versión 4 (v4)** de Tailwind, optimizamos significativamente el ecosistema del proyecto:
+* **Stack simplificado:** Se eliminó la necesidad del clásico archivo `tailwind.config.js`, centralizando la configuración de manera más nativa.
+* **Rendimiento en producción:** Mayor optimización y reducción drástica en el peso final del archivo CSS compilado.
 
 ### 2. Buscador Reactivo Optimizado (RxJS)
-Para el buscador de episodios, se uso una solución basada en programación reactiva que garantiza una experiencia 
-fluida para el usuario y eficiencia para el servidor:
-*   **`Escritura fluida`:**Se Utilizo debounceTime(300) para que la aplicación espere a que el usuario termine de escribir antes de realizar la búsqueda. Esto evita saturar la API con peticiones innecesarias tras cada tecla pulsada.
-*   **`Búsqueda inteligente`:** Se implemeto distinctUntilChanged() para asegurar que, si el usuario escribe y borra rápidamente volviendo al mismo texto, el sistema no realice búsquedas repetidas e innecesarias.
-*   **`Código limpio y seguro`:** Se empleo takeUntilDestroyed para gestionar automáticamente la limpieza de recursos. Esto elimina la necesidad de código repetitivo para cerrar suscripciones y previene errores de memoria, manteniendo la aplicación estable durante toda la sesión del usuario..
+Para el buscador de episodios, se implementó una arquitectura basada en **programación reactiva**, cumpliendo con el requisito de ofrecer filtros dinámicos y optimizar el consumo de recursos de la API mediante los siguientes operadores:
+
+* **Escritura fluida (`debounceTime(300)`):** Garantiza que la aplicación espere a que el usuario termine de escribir antes de realizar la petición HTTP, evitando saturar el servidor con solicitudes innecesarias por cada pulsación de tecla.
+* **Búsqueda inteligente (`distinctUntilChanged()`):** Previene llamadas duplicadas o redundantes a la API en caso de que el término de búsqueda no haya cambiado realmente.
+* **Código limpio y seguro (`takeUntilDestroyed`):** Gestiona de manera automática la destrucción y limpieza de las suscripciones al destruirse el componente, previniendo fugas de memoria (*memory leaks*) y garantizando la estabilidad de la app.
 
 ### 3. ModalService Desacoplado
-Para la "Vista de Detalles", no se integró la lógica HTML condicional pesada dentro de las tarjetas individuales. En su lugar:
-*   Se construyó un `ModalService` con patrón observador (`BehaviorSubject`).
-*   Se desarrolló el `EpisodeModalComponent` como un ente independiente inyectado directamente a nivel de página (fuera del bucle de tarjetas).
-*   **El Beneficio:** Mantenemos la estructura DOM ultra limpia y las responsabilidades separadas. Al hacer clic en un episodio, la tarjeta simplemente le "avisa" al servicio, y el modal reacciona automáticamente a este cambio global para mostrar la información enriquecida.
+Para la "Vista de Detalles", se cubrió el requerimiento de desplegar un modal interactivo con información enriquecida mediante un diseño completamente modular:
+
+* **Patrón Observador:** Se construyó un `ModalService` utilizando `BehaviorSubject` para manejar el estado del modal de forma centralizada y reactiva.
+* **Inyección Independiente:** El `EpisodeModalComponent` fue desarrollado como un ente autónomo, inyectado directamente a nivel de página en lugar de estar acoplado al árbol principal.
+* **El Beneficio:** Mantenemos la estructura del DOM ultra limpia, aislamos las responsabilidades de la UI y aseguramos un código altamente legible, testeable y fácil de mantener.

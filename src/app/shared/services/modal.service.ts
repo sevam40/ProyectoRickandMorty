@@ -2,6 +2,14 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Episode } from '../../models/episode.model';
 
+/**
+ * Servicio encargado de gestionar el ciclo de vida de los modales en la aplicación.
+ * 
+ * Implementación técnica:
+ * - Utiliza un patrón de comunicación desacoplado para abrir/cerrar modales.
+ * - Centraliza la lógica de UI, evitando que los componentes de página 
+ *   tengan que gestionar manualmente el estado de visibilidad del modal.[cite: 1]
+ */
 @Injectable({
   providedIn: 'root'
 })
